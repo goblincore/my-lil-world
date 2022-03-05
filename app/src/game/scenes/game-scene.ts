@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { LEFT_CHEVRON, BG, CLICK } from "game/assets";
 import { AavegotchiGameObject } from "types";
 import { getGameWidth, getGameHeight, getRelative } from "../helpers";
@@ -28,9 +29,13 @@ export class GameScene extends Phaser.Scene {
     this.selectedGotchi = data.selectedGotchi;
   };
 
+
+
+
   public create(): void {
    
- 
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const self = this;
     this.socket = io('http://localhost:8080'); 
 
     this.socket.on("connect", () => {
@@ -38,8 +43,16 @@ export class GameScene extends Phaser.Scene {
       console.log('CLIENT CONNECCTED', this.socket.id); // x8WIv7-mJelg7on_ALbx
     });
 
-    this.socket.on('currentPlayers', function () {
-      console.log('CURERNET PLAYERS EMIT')
+    this.socket.on('currentPlayers', function (players: any) {
+      console.log('CURERNET PLAYERS EMIT', players);
+       // Add a player sprite that can be moved around.
+        if(self.socket) console.log('THIS PLAYER SOCKET ID',self.socket.id);
+        if (self.socket && players[self.socket.id]) {
+          console.log('FOUND MATCHING ID');
+          self.addPlayer(self, players[self.socket.id]);
+        }
+      
+     
     });
 
     // Add layout
@@ -50,6 +63,18 @@ export class GameScene extends Phaser.Scene {
     this.createBackButton();
 
   }
+
+  private addPlayer(self: this, playerId: string) {
+    console.log('ADD PLAYER');
+      this.player = new Player({
+        scene: this,
+        x: getGameWidth(this) / 2,
+        y: getGameHeight(this) / 2,
+        key: this.selectedGotchi?.spritesheetKey || "",
+      });
+    
+  }
+
 
 
   private createBackButton = () => {
