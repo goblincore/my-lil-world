@@ -1,4 +1,5 @@
 interface Props {
+  id?: string;
   scene: Phaser.Scene;
   x: number;
   y: number;
@@ -9,6 +10,7 @@ interface Props {
 export class Player extends Phaser.GameObjects.Sprite {
   private cursorKeys?: Phaser.Types.Input.Keyboard.CursorKeys;
   public speed = 200;
+  private playerId?: number | string;
 
   constructor({ scene, x, y, key }: Props) {
     super(scene, x, y, key);

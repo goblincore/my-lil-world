@@ -43,14 +43,21 @@ export class GameScene extends Phaser.Scene {
       console.log('CLIENT CONNECCTED', this.socket.id); // x8WIv7-mJelg7on_ALbx
     });
 
-    this.socket.on('currentPlayers', function (players: any) {
+    this.socket.on('currentPlayers', function (players: Player[]) {
       console.log('CURERNET PLAYERS EMIT', players);
        // Add a player sprite that can be moved around.
         if(self.socket) console.log('THIS PLAYER SOCKET ID',self.socket.id);
-        if (self.socket && players[self.socket.id]) {
-          console.log('FOUND MATCHING ID');
-          self.addPlayer(self, players[self.socket.id]);
-        }
+
+        Object.keys(players).forEach((playerKey: string) => {
+        // match current player
+          if (self.socket && playerKey === self.socket.id) {
+            console.log('FOUND MATCHING ID');
+            self.addPlayer(self, players[self.socket.id]);
+          } else {
+            self.addOtherPlayers(self, players[playerKey])
+          }
+
+        })
       
      
     });
@@ -64,7 +71,12 @@ export class GameScene extends Phaser.Scene {
 
   }
 
-  private addPlayer(self: this, playerId: string) {
+  private addOtherPlayers(self: this, player: any) {
+    console.log('addOtherPlayers')
+    this.addPlayer(this, player)
+  }
+
+  private addPlayer(self: this, player: any) {
     console.log('ADD PLAYER');
       this.player = new Player({
         scene: this,
