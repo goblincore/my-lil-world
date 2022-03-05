@@ -16,6 +16,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
  */
 export class GameScene extends Phaser.Scene {
   private player?: Player;
+  private otherPlayers?: Phaser.GameObjects.Group;
   private selectedGotchi?: AavegotchiGameObject;
   private socket?: Socket;
   // Sounds
@@ -33,6 +34,8 @@ export class GameScene extends Phaser.Scene {
 
 
   public create(): void {
+
+    this.otherPlayers = this.physics.add.group();
    
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const self = this;
@@ -62,6 +65,10 @@ export class GameScene extends Phaser.Scene {
      
     });
 
+    this.socket.on("disconnect", player => {
+        console.log('SOCKET DISCONNECT CALLBACK', player);
+    })
+
     // Add layout
     this.add
       .image(getGameWidth(this) / 2, getGameHeight(this) / 2, BG)
@@ -73,7 +80,13 @@ export class GameScene extends Phaser.Scene {
 
   private addOtherPlayers(self: this, player: any) {
     console.log('addOtherPlayers')
-    this.addPlayer(this, player)
+    const otherPlayer= new Player({
+      scene: this,
+      x: 200,
+      y: 200,
+      key: this.selectedGotchi?.spritesheetKey || '',
+    })
+    this.otherPlayers.add(otherPlayer);
   }
 
   private addPlayer(self: this, player: any) {
