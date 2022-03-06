@@ -1,22 +1,32 @@
 interface Props {
   id?: string;
   scene: Phaser.Scene;
+  oldPosition?: {
+    x: number,
+    y: number,
+  };
   x: number;
   y: number;
   key: string;
   frame?: number;
 }
 
+
 export class Player extends Phaser.GameObjects.Sprite {
   private cursorKeys?: Phaser.Types.Input.Keyboard.CursorKeys;
   public speed = 200;
-  private playerId?: number | string;
+  private id?: number | string;
+  public oldPosition = {x: 0, y: 0};
 
-  constructor({ scene, x, y, key }: Props) {
+  constructor({ scene, x, y, key, id }: Props) {
     super(scene, x, y, key);
 
     // sprite
     this.setOrigin(0, 0);
+    this.oldPosition.x = x;
+    this.oldPosition.y = y;
+
+    this.id = id;
 
     // Add animations
     this.anims.create({
@@ -48,6 +58,7 @@ export class Player extends Phaser.GameObjects.Sprite {
   }
 
   update(): void {
+
     // Every frame, we create a new velocity for the sprite based on what keys the player is holding down.
     const velocity = new Phaser.Math.Vector2(0, 0);
     // Horizontal movement
@@ -77,5 +88,7 @@ export class Player extends Phaser.GameObjects.Sprite {
     // We normalize the velocity so that the player is always moving at the same speed, regardless of direction.
     const normalizedVelocity = velocity.normalize();
     (this.body as Phaser.Physics.Arcade.Body).setVelocity(normalizedVelocity.x * this.speed, normalizedVelocity.y * this.speed);
+
+
   }
 }

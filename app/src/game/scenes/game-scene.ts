@@ -16,7 +16,7 @@ const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
  */
 export class GameScene extends Phaser.Scene {
   private player?: Player;
-  private otherPlayers?: Phaser.GameObjects.Group;
+  private otherPlayers?: any;
   private selectedGotchi?: AavegotchiGameObject;
   private socket?: Socket;
   // Sounds
@@ -35,11 +35,13 @@ export class GameScene extends Phaser.Scene {
 
   public create(): void {
 
-    this.otherPlayers = this.physics.add.group();
+   
    
     // eslint-disable-next-line @typescript-eslint/no-this-alias
-    const self = this;
+    const scene = this;
     this.socket = io('http://localhost:8080'); 
+   
+    scene.otherPlayers = this.physics.add.group();
 
     this.socket.on("connect", () => {
       if(this.socket)
@@ -49,21 +51,39 @@ export class GameScene extends Phaser.Scene {
     this.socket.on('currentPlayers', function (players: Player[]) {
       console.log('CURERNET PLAYERS EMIT', players);
        // Add a player sprite that can be moved around.
-        if(self.socket) console.log('THIS PLAYER SOCKET ID',self.socket.id);
+        if(scene.socket) console.log('THIS PLAYER SOCKET ID',scene.socket.id);
 
         Object.keys(players).forEach((playerKey: string) => {
         // match current player
-          if (self.socket && playerKey === self.socket.id) {
+          if (scene.socket && playerKey === scene.socket.id) {
             console.log('FOUND MATCHING ID');
-            self.addPlayer(self, players[self.socket.id]);
+            scene.addPlayer(scene, players[playerKey]);
           } else {
-            self.addOtherPlayers(self, players[playerKey])
+            scene.addOtherPlayers(scene, players[playerKey])
           }
 
         })
-      
-     
     });
+
+    this.socket.on("newPlayer", function (playerInfo) {
+      console.log('socket on new player')
+      scene.addOtherPlayers(scene, playerInfo);
+    });
+
+    this.socket.on("playerMoved", function (playerInfo) {
+      console.log('playerMoved', playerInfo);
+      scene?.otherPlayers && scene.otherPlayers.getChildren().forEach(function (otherPlayer: { id: any; x: any; y: any; setPosition: (arg0: any, arg1: any) => void; }) {
+        console.log('Other player Moved', otherPlayer);
+        if (playerInfo.id === otherPlayer.id) {
+          const oldX = otherPlayer.x;
+          const oldY = otherPlayer.y;
+          console.log('otherPlayerSetPposition');
+          otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+        }
+      });
+    });
+
+
 
     this.socket.on("disconnect", player => {
         console.log('SOCKET DISCONNECT CALLBACK', player);
@@ -78,18 +98,19 @@ export class GameScene extends Phaser.Scene {
 
   }
 
-  private addOtherPlayers(self: this, player: any) {
-    console.log('addOtherPlayers')
+  private addOtherPlayers(scene: this, player: any) {
+    console.log('addOtherPlayers', player);
     const otherPlayer= new Player({
       scene: this,
-      x: 200,
-      y: 200,
+      id: player.id,
+      x: getGameWidth(this) / 2,
+      y: getGameHeight(this) / 2,
       key: this.selectedGotchi?.spritesheetKey || '',
     })
-    this.otherPlayers.add(otherPlayer);
+    this.otherPlayers?.add(otherPlayer);
   }
 
-  private addPlayer(self: this, player: any) {
+  private addPlayer(scene: this, player: any) {
     console.log('ADD PLAYER');
       this.player = new Player({
         scene: this,
@@ -117,5 +138,30 @@ export class GameScene extends Phaser.Scene {
   public update(): void {
     // Every frame, we update the player
     this.player?.update();
+
+    if(this.player && this.socket){
+    const x = this.player?.x;
+    const y = this.player?.y;
+
+       // emit player movement
+       if (
+         this.player.oldPosition &&
+         (x !== this.player.oldPosition.x ||
+           y !== this.player.oldPosition.y)
+       ) {
+      
+         this.socket.emit("playerMovement", {
+           x: this.player.x,
+           y: this.player.y,
+         });
+       }
+       // save old position data
+       this.player.oldPosition = {
+         x: this.player.x,
+         y: this.player.y,
+       };
+    }
+
+
   }
 }
