@@ -48,6 +48,7 @@ export class GameScene extends Phaser.Scene {
       console.log('CLIENT CONNECCTED', this.socket.id); // x8WIv7-mJelg7on_ALbx
     });
 
+    // When a new player joins, add the current players
     this.socket.on('currentPlayers', function (players: Player[]) {
       console.log('CURERNET PLAYERS EMIT', players);
        // Add a player sprite that can be moved around.
@@ -65,6 +66,7 @@ export class GameScene extends Phaser.Scene {
         })
     });
 
+    // For everyone already connected, alert them of the new player
     this.socket.on("newPlayer", function (playerInfo) {
       console.log('socket on new player')
       scene.addOtherPlayers(scene, playerInfo);
@@ -110,8 +112,8 @@ export class GameScene extends Phaser.Scene {
     const otherPlayer= new Player({
       scene: this,
       id: player.id,
-      x: getGameWidth(this) / 2,
-      y: getGameHeight(this) / 2,
+      x: player.x,
+      y: player.y,
       key: this.selectedGotchi?.spritesheetKey || '',
     })
     this.otherPlayers?.add(otherPlayer);
