@@ -31,25 +31,32 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.oldPosition.x = x;
     this.oldPosition.y = y;
     this.id = id;
+    this.scaleX = 6.4;
+    this.scaleY = 6.4;
 
     // Add animations
     this.anims.create({
       key: 'idle',
-      frames: this.anims.generateFrameNumbers(key || '', { start: 0, end: 1 }),
+      frames: this.anims.generateFrameNumbers(key || '', { start: 0, end: 2 }),
       frameRate: 2,
       repeat: -1,
     });
     this.anims.create({
       key: 'left',
-      frames: this.anims.generateFrameNumbers(key || '', { frames: [ 2 ]}),
+      frames: this.anims.generateFrameNumbers(key || '', { frames: [ 6, 7 ]}),
     });
     this.anims.create({
       key: 'right',
-      frames: this.anims.generateFrameNumbers(key || '', { frames: [ 4 ]}),
+      frames: this.anims.generateFrameNumbers(key || '', { frames: [ 8, 9 ]}),
     });
     this.anims.create({
       key: 'up',
-      frames: this.anims.generateFrameNumbers(key || '', { frames: [ 6 ]}),
+      frames: this.anims.generateFrameNumbers(key || '', { frames: [ 3, 4, 5 ]}),
+    });
+
+    this.anims.create({
+      key: 'down',
+      frames: this.anims.generateFrameNumbers(key || '', { frames: [ 0, 1, 2 ]}),
     });
 
     // physics
@@ -81,7 +88,7 @@ export class Player extends Phaser.GameObjects.Sprite {
     switch (true) {
       case this.cursorKeys?.down.isDown:
         velocity.y += 1;
-        this.anims.play('idle', false);
+        this.anims.play('down', true);
         break;
       case this.cursorKeys?.up.isDown:
         velocity.y -= 1;
