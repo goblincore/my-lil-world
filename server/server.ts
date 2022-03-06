@@ -48,10 +48,18 @@ io.on('connection', function (socket: Socket) {
       const { x, y } = data;
       connectedUsers[socket.id].x = x;
       connectedUsers[socket.id].y = y;
+
+      console.log('playerMovement', data);
       // emit a message to all players about the player that moved
-      socket.emit("playerMoved", connectedUsers[socket.id]);
+      socket.broadcast.emit("playerMoved", connectedUsers[socket.id]);
     });
 
+    socket.on("playerStopped", function (data) {
+      const { x, y } = data;
+      connectedUsers[socket.id].x = x;
+      connectedUsers[socket.id].y = y;
+      socket.broadcast.emit("otherPlayerStopped",  connectedUsers[socket.id]);
+    });
 
 
     socket.on('disconnect', function () {
