@@ -14,8 +14,9 @@ const io = require('socket.io')(http, {
 const port = process.env.PORT || 8080;
 
 const connectedUsers= {};
+const gameNamespace = io.of("/game");
 
-io.on('connection', function (socket: Socket) {
+gameNamespace.on('connection', function (socket: Socket) {
     const userId = socket.id;
 
     console.log('A user connected: ' + userId);
@@ -29,14 +30,14 @@ io.on('connection', function (socket: Socket) {
       animKey: 'idle',
     };
 
-    socket.on('handleDisconnect', () => {
-      socket.disconnect();
-    })
+    // emit is to just a particular user
+    // broadcast emit is to everyone in the room
+
 
     // this sets specific gotchi data for a specific player object
-    socket.on('setUsersData', (gotchi) => {
-      connectedUsers[userId].gotchi = gotchi;
-    })
+    // socket.on('setUsersData', (gotchi) => {
+    //   connectedUsers[userId].gotchi = gotchi;
+    // })
 
     // This  emits events to this particular you-ser (eg all the other players info)
     socket.emit('currentPlayers', connectedUsers);
