@@ -65,6 +65,8 @@ io.on('connection', function (socket: Socket) {
     socket.on('disconnect', function () {
       console.log('A user disconnected: ' + userId);
       delete connectedUsers[userId];
+      socket.broadcast.emit("disconnected", {id: socket.id });
+     
     });
 });
 
