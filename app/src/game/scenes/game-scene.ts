@@ -85,9 +85,16 @@ export class GameScene extends Phaser.Scene {
 
 
 
-    this.socket.on("disconnect", player => {
-        console.log('SOCKET DISCONNECT CALLBACK', player);
-    })
+    this.socket.on("disconnected", function (playerId){
+      const { id } = playerId;
+
+      console.log('user disconnected', playerId);
+      scene.otherPlayers.getChildren().forEach(function (otherPlayer: Player) {
+        if (id === otherPlayer.id) {
+          otherPlayer.destroy();
+        }
+      });
+    });
 
     // Add layout
     this.add
