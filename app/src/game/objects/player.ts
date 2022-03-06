@@ -15,7 +15,7 @@ interface Props {
 export class Player extends Phaser.GameObjects.Sprite {
   private cursorKeys?: Phaser.Types.Input.Keyboard.CursorKeys;
   public speed = 200;
-  private id?: number | string;
+  public id?: number | string;
   public oldPosition = {x: 0, y: 0};
 
   constructor({ scene, x, y, key, id }: Props) {
