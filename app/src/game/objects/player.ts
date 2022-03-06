@@ -90,7 +90,6 @@ export class Player extends Phaser.GameObjects.Sprite {
     }
 
 
-
     if(socket){
       const x = this.x;
       const y = this.y;
@@ -106,7 +105,7 @@ export class Player extends Phaser.GameObjects.Sprite {
            socket.emit("playerMovement", {
              x: this.x,
              y: this.y,
-             rotation: this.rotation,
+             animKey: this.anims.getName(),
            });
          }
          // save old position data
