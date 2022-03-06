@@ -45,23 +45,39 @@ io.on('connection', function (socket: Socket) {
     socket.broadcast.emit('newPlayer',  connectedUsers[userId]);
 
 
+    // When a player moves, update their coordinates and animation key
     socket.on("playerMovement", function (data) {
       const { x, y } = data;
       connectedUsers[socket.id].x = x;
       connectedUsers[socket.id].y = y;
       connectedUsers[socket.id].animKey = data?.animKey;
 
-      console.log('playerMovement', data);
+      // console.log('playerMovement', data);
       // emit a message to all players about the player that moved
       socket.broadcast.emit("playerMoved", connectedUsers[socket.id]);
     });
 
+    // When a player stops moving....? not sure this is needed atm 
     socket.on("playerStopped", function (data) {
       const { x, y } = data;
       connectedUsers[socket.id].x = x;
       connectedUsers[socket.id].y = y;
       socket.broadcast.emit("otherPlayerStopped",  connectedUsers[socket.id]);
     });
+
+
+    // When the youtube player instance is playing, start it playing for all users in the room
+
+    socket.on("youtubePlayerStart", (args) => {
+      console.log('youtubePlayerSTart', args);
+      socket.emit("playYoutube", args);
+      socket.broadcast.emit("playYoutube", args);
+    })
+
+    socket.on("youtubePlayerStop", (args) => {
+      console.log('youtubePlayerStop',args );
+      socket.broadcast.emit("stopYoutube", args);
+    })
 
 
     socket.on('disconnect', function () {

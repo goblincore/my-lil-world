@@ -4,6 +4,7 @@ import { AavegotchiGameObject } from "types";
 import { getGameWidth, getGameHeight, getRelative } from "../helpers";
 import { Player } from "game/objects";
 import { io, Socket } from "socket.io-client";
+import {  LilYoutubePlayer } from "game/objects/youtubePlayer";
 
 const sceneConfig: Phaser.Types.Scenes.SettingsConfig = {
   active: false,
@@ -21,6 +22,7 @@ export class GameScene extends Phaser.Scene {
   private socket?: Socket;
   // Sounds
   private back?: Phaser.Sound.BaseSound;
+  private youtubePlayer?: LilYoutubePlayer;
 
   constructor() {
     super(sceneConfig);
@@ -31,14 +33,17 @@ export class GameScene extends Phaser.Scene {
   };
 
 
-
-
   public create(): void {
 
-    this.add.dom(350, 250)
-    .createFromHTML('<iframe width="320" height="240" src="https://www.youtube.com/embed/JNJJ-QkZ8cM?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>');
-
-   
+    const youtubePlayerProps = {
+      scene: this,
+      x: getGameWidth(this) - 250,
+      y: 200,
+      width: 320,
+      height: 240,
+    }
+    this.youtubePlayer = new LilYoutubePlayer({...youtubePlayerProps});
+    this.youtubePlayer.load('Csev9IUatzc', false);
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const scene = this;
     this.socket = io('http://localhost:8080'); 
@@ -86,6 +91,17 @@ export class GameScene extends Phaser.Scene {
       });
     });
 
+    // youtube player handle
+    this.socket.on("playYoutube", (value) => {
+      console.log('YOUTUBE PLAYER START', value);
+      this.youtubePlayer?.setPlaybackTime(0); // todo pass this in from emitted event
+      this.youtubePlayer?.play();
+    })
+
+    this.socket.on("youtubePlayerStop", (value) => {
+      console.log('YOUTUBE PLAYER STOP', value);
+      this.youtubePlayer?.pause();
+    })
 
 
     this.socket.on("disconnected", function (playerId){
@@ -108,6 +124,8 @@ export class GameScene extends Phaser.Scene {
 
   }
 
+
+  // Adds a player instance for other users
   private addOtherPlayers(scene: this, player: any) {
     console.log('addOtherPlayers', player);
     const otherPlayer= new Player({
@@ -121,6 +139,7 @@ export class GameScene extends Phaser.Scene {
     this.otherPlayers?.add(otherPlayer);
   }
 
+  // Adds current user instance
   private addPlayer(scene: this, player: any) {
     console.log('ADD PLAYER');
       this.player = new Player({
@@ -142,8 +161,11 @@ export class GameScene extends Phaser.Scene {
       .setDisplaySize(getRelative(94, this), getRelative(94, this))
       .on("pointerdown", () => {
 
-        this.back?.play();
-        window.history.back();
+        this.socket?.emit("youtubePlayerStart", true);
+        this.youtubePlayer?.setPlaybackTime(0);
+        this.youtubePlayer?.play();
+        // this.back?.play();
+        // window.history.back();
       });
   };
 

@@ -1,7 +1,18 @@
-import Game from 'game/main';
+import React, {useEffect, useState} from 'react';
+import Game from "game/main";
 
-const Play = () => (
-  <Game />
-);
+
+
+const Play = () =>{
+  
+ return(
+   
+   <section>
+    
+    <Game />
+  </section>
+  )
+};
 
 export default Play;
+
