@@ -13,7 +13,7 @@ const io = require('socket.io')(http, {
 
 const port = process.env.PORT || 8080;
 
-const connectedGotchis = {};
+const connectedUsers= {};
 
 io.on('connection', function (socket: Socket) {
     const userId = socket.id;
@@ -21,7 +21,7 @@ io.on('connection', function (socket: Socket) {
     console.log('A user connected: ' + userId);
 
     // New User connected, generated object
-    connectedGotchis[userId] = {
+    connectedUsers[userId] = {
       id: userId,
       rotation: 0,
       x: Math.floor(Math.random() * 700) + 50,
@@ -33,19 +33,30 @@ io.on('connection', function (socket: Socket) {
     })
 
     // this sets specific gotchi data for a specific player object
-    socket.on('setGotchiData', (gotchi) => {
-      connectedGotchis[userId].gotchi = gotchi;
+    socket.on('setUsersData', (gotchi) => {
+      connectedUsers[userId].gotchi = gotchi;
     })
 
-    // This  emits events to this particular user (all other players)
-    socket.emit('currentPlayers', connectedGotchis);
+    // This  emits events to this particular you-ser (eg all the other players info)
+    socket.emit('currentPlayers', connectedUsers);
 
-    // this emits events to everyone else (current connectd player movement etc)
-    socket.broadcast.emit('newPlayer',  connectedGotchis[userId]);
+    // this emits events to everyone else (current connectd player movement etc eg you-ser)
+    socket.broadcast.emit('newPlayer',  connectedUsers[userId]);
+
+
+    socket.on("playerMovement", function (data) {
+      const { x, y } = data;
+      connectedUsers[socket.id].x = x;
+      connectedUsers[socket.id].y = y;
+      // emit a message to all players about the player that moved
+      socket.emit("playerMoved", connectedUsers[socket.id]);
+    });
+
+
 
     socket.on('disconnect', function () {
       console.log('A user disconnected: ' + userId);
-      delete connectedGotchis[userId];
+      delete connectedUsers[userId];
     });
 });
 
