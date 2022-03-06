@@ -29,6 +29,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   init = (data: { selectedGotchi: AavegotchiGameObject }): void => {
+    console.log('GAME SCENE init data', data);
     this.selectedGotchi = data.selectedGotchi;
   };
 
@@ -46,8 +47,9 @@ export class GameScene extends Phaser.Scene {
     this.youtubePlayer.load('Csev9IUatzc', false);
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const scene = this;
-    this.socket = io('http://localhost:8080'); 
-   
+    this.socket = io('http://localhost:8080/game'); 
+
+
     scene.otherPlayers = this.physics.add.group();
 
     this.socket.on("connect", () => {
@@ -64,7 +66,7 @@ export class GameScene extends Phaser.Scene {
         Object.keys(players).forEach((playerKey: string) => {
         // match current player
           if (scene.socket && playerKey === scene.socket.id) {
-            console.log('FOUND MATCHING ID');
+            console.log('FOUND MATCHING ID for currentUser');
             scene.addPlayer(scene, players[playerKey]);
           } else {
             scene.addOtherPlayers(scene, players[playerKey])
@@ -108,11 +110,11 @@ export class GameScene extends Phaser.Scene {
       const { id } = playerId;
 
       console.log('user disconnected', playerId);
-      scene.otherPlayers.getChildren().forEach(function (otherPlayer: Player) {
-        if (id === otherPlayer.id) {
-          otherPlayer.destroy();
-        }
-      });
+      // scene.otherPlayers.getChildren().forEach(function (otherPlayer: Player) {
+      //   if (id === otherPlayer.id) {
+      //     otherPlayer.destroy();
+      //   }
+      // });
     });
 
     // Add layout
