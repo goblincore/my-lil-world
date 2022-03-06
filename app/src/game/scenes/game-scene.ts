@@ -67,19 +67,19 @@ export class GameScene extends Phaser.Scene {
     });
 
     // For everyone already connected, alert them of the new player
-    this.socket.on("newPlayer", function (playerInfo) {
+    this.socket.on("newPlayer", (playerInfo) =>  {
       console.log('socket on new player')
       scene.addOtherPlayers(scene, playerInfo);
     });
 
-    this.socket.on("playerMoved", function (playerInfo) {
+    this.socket.on("playerMoved", (playerInfo) => {
       console.log('playerMoved', playerInfo);
       scene?.otherPlayers && scene.otherPlayers.getChildren().forEach(function (otherPlayer: Player) {
-        console.log('other player animation current', otherPlayer);
+        console.log('other player', otherPlayer);
         if (playerInfo.id === otherPlayer.id) {
-          const oldX = otherPlayer.x;
-          const oldY = otherPlayer.y;
-          otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+          const {x, y, animKey} = playerInfo;
+          otherPlayer.anims.play(animKey, true);
+          otherPlayer.setPosition(x, y);
         }
       });
     });

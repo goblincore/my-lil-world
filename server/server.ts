@@ -26,6 +26,7 @@ io.on('connection', function (socket: Socket) {
       rotation: 0,
       x: Math.floor(Math.random() * 700) + 50,
       y: Math.floor(Math.random() * 500) + 50,
+      animKey: 'idle',
     };
 
     socket.on('handleDisconnect', () => {
@@ -48,6 +49,7 @@ io.on('connection', function (socket: Socket) {
       const { x, y } = data;
       connectedUsers[socket.id].x = x;
       connectedUsers[socket.id].y = y;
+      connectedUsers[socket.id].animKey = data?.animKey;
 
       console.log('playerMovement', data);
       // emit a message to all players about the player that moved
