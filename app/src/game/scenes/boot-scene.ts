@@ -72,6 +72,8 @@ export class BootScene extends Phaser.Scene {
       this
     );
     this.loadNextFile(0);
+    this.load.plugin('rexyoutubeplayerplugin', 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexyoutubeplayerplugin.min.js', true);
+
   };
 
   /**

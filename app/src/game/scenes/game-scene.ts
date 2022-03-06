@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { LEFT_CHEVRON, BG, CLICK } from "game/assets";
+import { LEFT_CHEVRON, BG, CLICK, PLAYER } from "game/assets";
 import { AavegotchiGameObject } from "types";
 import { getGameWidth, getGameHeight, getRelative } from "../helpers";
 import { Player } from "game/objects";
@@ -35,7 +35,9 @@ export class GameScene extends Phaser.Scene {
 
   public create(): void {
 
-   
+    this.add.dom(350, 250)
+    .createFromHTML('<iframe width="320" height="240" src="https://www.youtube.com/embed/JNJJ-QkZ8cM?controls=0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>');
+
    
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const scene = this;
@@ -114,7 +116,7 @@ export class GameScene extends Phaser.Scene {
       x: player.x,
       y: player.y,
       rotation: player.rotation,
-      key: this.selectedGotchi?.spritesheetKey || '',
+      key: PLAYER || '',
     })
     this.otherPlayers?.add(otherPlayer);
   }
@@ -125,7 +127,7 @@ export class GameScene extends Phaser.Scene {
         scene: this,
         x: getGameWidth(this) / 2,
         y: getGameHeight(this) / 2,
-        key: this.selectedGotchi?.spritesheetKey || "",
+        key: PLAYER || "",
       });
     
   }

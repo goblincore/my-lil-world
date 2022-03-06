@@ -15,23 +15,33 @@ const Main = () => {
   const [initialised, setInitialised] = useState(true);
   const [config, setConfig] = useState<GameInstance>();
 
-  const startGame = async (socket: Socket, selectedGotchi: AavegotchiObject) => {
-    const width = window.innerWidth;
+  const startGame = async (
+    socket: Socket,
+    selectedGotchi: AavegotchiObject
+  ) => {
+    const width = window.innerHeight;
     const height = window.innerHeight;
 
-    console.log('selecetdGotchi', selectedGotchi);
+    console.log("selecetdGotchi", selectedGotchi);
 
     if (!selectedGotchi.svg) {
       try {
         if (!provider) throw "Not connected to web3";
-        const svg = await useDiamondCall<Tuple<string, 4>>(provider, {name: "getAavegotchiSideSvgs", parameters: [selectedGotchi.id]});
+        const svg = await useDiamondCall<Tuple<string, 4>>(provider, {
+          name: "getAavegotchiSideSvgs",
+          parameters: [selectedGotchi.id],
+        });
         selectedGotchi.svg = svg;
       } catch (err) {
         console.error(err);
       }
     }
-    
+
     setConfig({
+      parent: 'game-parent',
+      dom: {
+        createContainer: true,
+      },
       type: Phaser.AUTO,
       physics: {
         default: "arcade",
@@ -55,22 +65,26 @@ const Main = () => {
           setInitialised(false);
           game.registry.merge({
             selectedGotchi,
-            socket
+            socket,
           });
         },
       },
     });
-  }
+  };
 
   useEffect(() => {
     if (usersAavegotchis && selectedAavegotchiId) {
       // Socket is called here so we can take advantage of the useEffect hook to disconnect upon leaving the game screen
-      const socket = io(process.env.REACT_APP_SERVER_PORT || 'http://localhost:8080');
-      console.log('userAavegotchis', usersAavegotchis);
-      const selectedGotchi = usersAavegotchis.find(gotchi => gotchi.id === selectedAavegotchiId);
+      const socket = io(
+        process.env.REACT_APP_SERVER_PORT || "http://localhost:8080"
+      );
+      console.log("userAavegotchis", usersAavegotchis);
+      const selectedGotchi = usersAavegotchis.find(
+        (gotchi) => gotchi.id === selectedAavegotchiId
+      );
       if (!selectedGotchi) return;
-      
-      startGame(socket, selectedGotchi)
+
+      startGame(socket, selectedGotchi);
 
       return () => {
         socket.emit("handleDisconnect");
@@ -82,7 +96,14 @@ const Main = () => {
     return <Redirect to="/" />;
   }
 
-  return <IonPhaser initialize={initialised} game={config} id="phaser-app" />;
+  return (
+    <main>
+      <article className="room-window-container" id="game-parent">
+        <IonPhaser initialize={initialised} game={config} id="phaser-app" />
+      </article>
+      <aside className="right-sidebar"></aside>
+    </main>
+  );
 };
 
 export default Main;
