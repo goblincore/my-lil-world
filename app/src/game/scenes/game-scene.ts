@@ -74,12 +74,11 @@ export class GameScene extends Phaser.Scene {
 
     this.socket.on("playerMoved", function (playerInfo) {
       console.log('playerMoved', playerInfo);
-      scene?.otherPlayers && scene.otherPlayers.getChildren().forEach(function (otherPlayer: { id: any; x: any; y: any; setPosition: (arg0: any, arg1: any) => void; }) {
-        console.log('Other player Moved', otherPlayer);
+      scene?.otherPlayers && scene.otherPlayers.getChildren().forEach(function (otherPlayer: Player) {
+        console.log('other player animation current', otherPlayer);
         if (playerInfo.id === otherPlayer.id) {
           const oldX = otherPlayer.x;
           const oldY = otherPlayer.y;
-          console.log('otherPlayerSetPposition');
           otherPlayer.setPosition(playerInfo.x, playerInfo.y);
         }
       });
@@ -114,6 +113,7 @@ export class GameScene extends Phaser.Scene {
       id: player.id,
       x: player.x,
       y: player.y,
+      rotation: player.rotation,
       key: this.selectedGotchi?.spritesheetKey || '',
     })
     this.otherPlayers?.add(otherPlayer);
@@ -139,6 +139,7 @@ export class GameScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true })
       .setDisplaySize(getRelative(94, this), getRelative(94, this))
       .on("pointerdown", () => {
+
         this.back?.play();
         window.history.back();
       });
@@ -146,30 +147,7 @@ export class GameScene extends Phaser.Scene {
 
   public update(): void {
     // Every frame, we update the player
-    this.player?.update();
-
-    if(this.player && this.socket){
-    const x = this.player?.x;
-    const y = this.player?.y;
-
-       // emit player movement
-       if (
-         this.player.oldPosition &&
-         (x !== this.player.oldPosition.x ||
-           y !== this.player.oldPosition.y)
-       ) {
-      
-         this.socket.emit("playerMovement", {
-           x: this.player.x,
-           y: this.player.y,
-         });
-       }
-       // save old position data
-       this.player.oldPosition = {
-         x: this.player.x,
-         y: this.player.y,
-       };
-    }
+    this.player?.update(this, this.socket);
 
 
   }

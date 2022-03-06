@@ -1,3 +1,6 @@
+import { GameScene } from "game/scenes/game-scene";
+import { Socket } from "socket.io-client";
+
 interface Props {
   id?: string;
   scene: Phaser.Scene;
@@ -8,6 +11,7 @@ interface Props {
   x: number;
   y: number;
   key: string;
+  rotation?: string;
   frame?: number;
 }
 
@@ -18,6 +22,7 @@ export class Player extends Phaser.GameObjects.Sprite {
   public id?: number | string;
   public oldPosition = {x: 0, y: 0};
 
+
   constructor({ scene, x, y, key, id }: Props) {
     super(scene, x, y, key);
 
@@ -25,7 +30,6 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.setOrigin(0, 0);
     this.oldPosition.x = x;
     this.oldPosition.y = y;
-
     this.id = id;
 
     // Add animations
@@ -57,7 +61,7 @@ export class Player extends Phaser.GameObjects.Sprite {
     this.scene.add.existing(this);
   }
 
-  update(): void {
+  update(scene: GameScene, socket:Socket): void {
 
     // Every frame, we create a new velocity for the sprite based on what keys the player is holding down.
     const velocity = new Phaser.Math.Vector2(0, 0);
@@ -84,6 +88,34 @@ export class Player extends Phaser.GameObjects.Sprite {
         this.anims.play('up', true);
         break;
     }
+
+
+
+    if(socket){
+      const x = this.x;
+      const y = this.y;
+      
+  
+         // emit player movement
+         if (
+           this.oldPosition &&
+           (x !== this.oldPosition.x ||
+             y !== this.oldPosition.y)
+         ) {
+        
+           socket.emit("playerMovement", {
+             x: this.x,
+             y: this.y,
+             rotation: this.rotation,
+           });
+         }
+         // save old position data
+         this.oldPosition = {
+           x: this.x,
+           y: this.y,
+         };
+      }
+
 
     // We normalize the velocity so that the player is always moving at the same speed, regardless of direction.
     const normalizedVelocity = velocity.normalize();
