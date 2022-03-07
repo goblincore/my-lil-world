@@ -110,11 +110,11 @@ export class GameScene extends Phaser.Scene {
       const { id } = playerId;
 
       console.log('user disconnected', playerId);
-      // scene.otherPlayers.getChildren().forEach(function (otherPlayer: Player) {
-      //   if (id === otherPlayer.id) {
-      //     otherPlayer.destroy();
-      //   }
-      // });
+      scene.otherPlayers.getChildren().forEach(function (otherPlayer: Player) {
+        if (id === otherPlayer.id) {
+          otherPlayer.destroy();
+        }
+      });
     });
 
     // Add layout
