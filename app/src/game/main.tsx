@@ -102,7 +102,19 @@ const Main = () => {
       <article className={styles.roomWindow} id="game-parent">
         <IonPhaser initialize={initialised} game={config} id="phaser-app" />
       </article>
-      <aside className={styles.rightSidebar}></aside>
+      <aside className={styles.rightSidebar}>
+        <section className={styles.mainChat}>
+
+
+        
+        </section>
+
+        <section className={styles.inputContainer}>
+          <input className={styles.chatInput}></input>
+        </section>
+
+
+      </aside>
     </main>
   );
 };
