@@ -1,0 +1,16 @@
+.mainContainer {
+    display: flex;
+    position: relative;
+  }
+  
+  .roomWindow{
+    max-width: fit-content;
+    width: 100%;
+  }
+  
+  
+  .rightSidebar {
+    display: flex;
+    width: 100%;
+    background-color: blue;
+  }

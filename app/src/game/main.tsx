@@ -7,6 +7,7 @@ import Scenes from "./scenes";
 import io, { Socket } from "socket.io-client";
 import { AavegotchiObject, Tuple } from "types";
 import { useDiamondCall } from "web3/actions";
+import styles from "./styles.module.css";
 
 const Main = () => {
   const {
@@ -97,11 +98,11 @@ const Main = () => {
   }
 
   return (
-    <main>
-      <article className="room-window-container" id="game-parent">
+    <main className={styles.mainContainer}>
+      <article className={styles.roomWindow} id="game-parent">
         <IonPhaser initialize={initialised} game={config} id="phaser-app" />
       </article>
-      <aside className="right-sidebar"></aside>
+      <aside className={styles.rightSidebar}></aside>
     </main>
   );
 };
